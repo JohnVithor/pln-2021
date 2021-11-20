@@ -111,9 +111,6 @@ def test_handle_unknown_token(token, tag, default):
     else:
         handle_predicted_tag(default, tag)
 
-def handle_unpredicted_tags():
-    pass
-
 def main():
 
     if len(sys.argv) != 3:
@@ -147,8 +144,6 @@ def main():
             test_handle_known_token(token, tag)
         else:
             test_handle_unknown_token(token, tag, handle_unknown)
-
-    handle_unpredicted_tags()
 
     df = pd.DataFrame.from_dict(results_count)
     for tag in df.columns:
