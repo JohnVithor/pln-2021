@@ -5,6 +5,8 @@ import re
 from numpy import NaN
 import pandas as pd
 import operator
+import json
+import metrics
 
 MIN_QTD = 10
 
@@ -97,6 +99,7 @@ def test_handle_token_with_unknown_tag(token, tag):
 def test_handle_known_token(token, tag):
     p_tag = predict_tag_for_token(token)
     handle_predicted_tag(p_tag, tag)
+    return p_tag
 
 def token_is_CD_tag(token, tag):
     return re.match("\d*\.?\d+", token)
@@ -104,12 +107,14 @@ def token_is_CD_tag(token, tag):
 def handle_CD_token(token, tag):
     p_tag = "CD"
     handle_predicted_tag(p_tag, tag)
+    return "CD"
 
 def test_handle_unknown_token(token, tag, default):
     if token_is_CD_tag(token, tag):
-        handle_CD_token(token, tag)
+        return handle_CD_token(token, tag)
     else:
         handle_predicted_tag(default, tag)
+        return default
 
 def main():
 
@@ -135,15 +140,23 @@ def main():
 
     handle_unknown = compute_unknow_handle()
 
+    predicted = []
+    expected = []
+
     for pair in test:
         if pair_is_valid(pair):
             continue
         token, tag = pair.split('_')
         token = preprocess_token(token)
         if token_is_known(token):
-            test_handle_known_token(token, tag)
+            p_tag = test_handle_known_token(token, tag)
         else:
-            test_handle_unknown_token(token, tag, handle_unknown)
+            p_tag = test_handle_unknown_token(token, tag, handle_unknown)
+        predicted.append(p_tag)
+        expected.append(tag)
+
+    pred_expc = pd.DataFrame.from_dict({'predicted': predicted, 'expected':expected})
+    pred_expc.to_csv('pred_expc_unigram.csv', index=False)
 
     df = pd.DataFrame.from_dict(results_count)
     for tag in df.columns:
@@ -152,8 +165,11 @@ def main():
             df.loc[p_tag,:] = [NaN] * (len(df.columns))
     df.sort_index(axis=0, inplace=True)
     df.sort_index(axis=1, inplace=True)
-    df.to_csv('resultados.csv')
-    print(df.head())
+    df.fillna(0, inplace=True)
+    df.to_csv('resultados_unigram.csv')
+    
+    with open("metrics_unigram.json", 'w') as f:
+        json.dump(metrics.extract_metrics_from_confusion_matrix(df.values), f,indent=4, sort_keys=True)
 
 if __name__ == "__main__":
     main()

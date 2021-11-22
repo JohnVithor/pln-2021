@@ -5,6 +5,8 @@ import re
 from numpy import NaN
 import pandas as pd
 import operator
+import json
+import metrics
 
 MIN_QTD = 10
 
@@ -134,6 +136,7 @@ def test_handle_known_token(token, previous_token, tag, previous_p_tag):
     else:
         p_tag = predict_tag_for_token_with_unknown_previous_token(token, previous_p_tag)
     handle_predicted_tag(p_tag, tag)
+    return p_tag
 
 def token_is_CD_tag(token, tag):
     return re.match("\d*\.?\d+", token)
@@ -141,6 +144,7 @@ def token_is_CD_tag(token, tag):
 def handle_CD_token(token, tag):
     p_tag = "CD"
     handle_predicted_tag(p_tag, tag)
+    return "CD"
 
 def predict_unknow_tag_using_previous_token_p_tag(previous_token, previous_p_tag, handle_unknown):
     #TODO
@@ -148,10 +152,11 @@ def predict_unknow_tag_using_previous_token_p_tag(previous_token, previous_p_tag
 
 def test_handle_unknown_token(token, previous_token, tag, previous_p_tag, handle_unknown):
     if token_is_CD_tag(token, tag):
-        handle_CD_token(token, tag)
+        return handle_CD_token(token, tag)
     else:
         p_tag = predict_unknow_tag_using_previous_token_p_tag(previous_token, previous_p_tag, handle_unknown)
         handle_predicted_tag(p_tag, tag)
+        return p_tag
 
 def main():
 
@@ -185,6 +190,9 @@ def main():
     previous_token = '.'
     previous_p_tag = '.'
 
+    predicted = []
+    expected = []
+
     for pair in test:
         if pair_is_valid(pair):
             continue
@@ -194,8 +202,13 @@ def main():
             p_tag = test_handle_known_token(token, previous_token, tag, previous_p_tag)
         else:
             p_tag = test_handle_unknown_token(token, previous_token, tag, previous_p_tag, handle_unknown)
+        predicted.append(p_tag)
+        expected.append(tag)
         previous_token = token
         previous_p_tag = p_tag
+
+    pred_expc = pd.DataFrame.from_dict({'predicted': predicted, 'expected':expected})
+    pred_expc.to_csv('pred_expc_bigram.csv', index=False)
 
     df = pd.DataFrame.from_dict(results_count)
     for tag in df.columns:
@@ -204,8 +217,12 @@ def main():
             df.loc[p_tag,:] = [NaN] * (len(df.columns))
     df.sort_index(axis=0, inplace=True)
     df.sort_index(axis=1, inplace=True)
-    df.to_csv('resultados.csv')
-    print(df.head())
+    df.fillna(0, inplace=True)
+    df.to_csv('resultados_bigram.csv')
+    
+    with open("metrics_bigram.json", 'w') as f:
+        json.dump(metrics.extract_metrics_from_confusion_matrix(df.values), f,indent=4, sort_keys=True)
+
 
 if __name__ == "__main__":
     main()
