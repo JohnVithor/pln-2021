@@ -15,32 +15,35 @@ def extract_metrics_from_confusion_matrix(matrix):
     TPR = TP/(TP+FN)
     # Specificity or true negative rate
     TNR = TN/(TN+FP) 
-    # Precision or positive predictive value
-    PPV = TP/(TP+FP)
-    # Negative predictive value
-    NPV = TN/(TN+FN)
     # Fall out or false positive rate
     FPR = FP/(FP+TN)
     # False negative rate
     FNR = FN/(TP+FN)
+    # Precision or positive predictive value
+    PPV = TP/(TP+FP)
+    # Negative predictive value
+    NPV = TN/(TN+FN)
     # False discovery rate
     FDR = FP/(TP+FP)
     # Overall accuracy for each class
     ACC = (TP+TN)/(TP+FP+FN+TN)
+    # Overall accuracy for each class
+    F1_SCORE = TP/(TP+((FP+FN)/2))
 
     results = {
         "False Positive": FP,
         "False Negative": FN,
         "True Positive": TP,
         "True Negative": TN,
-        "true positive rate": TPR,
-        "true negative rate": TNR,
-        "positive predictive value": PPV,
-        "Negative predictive value": NPV,
-        "false positive rate": FPR,
-        "False negative rate": FNR,
-        "False discovery rate": FDR,
-        "accuracy": ACC
+        "True Positive rate": TPR,
+        "True Negative rate": TNR,
+        "False Positive rate": FPR,
+        "False Negative rate": FNR,
+        "Positive Predictive value": PPV,
+        "Negative Predictive value": NPV,
+        "False Discovery rate": FDR,
+        "Accuracy": ACC,
+        "F1 Score": F1_SCORE
     }
 
     for k in results:

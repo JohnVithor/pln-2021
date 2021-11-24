@@ -2,7 +2,7 @@
 
 import sys
 import re
-from numpy import NaN
+import numpy as np
 import pandas as pd
 import operator
 import json
@@ -210,18 +210,22 @@ def main():
     pred_expc = pd.DataFrame.from_dict({'predicted': predicted, 'expected':expected})
     pred_expc.to_csv('pred_expc_bigram.csv', index=False)
 
-    df = pd.DataFrame.from_dict(results_count)
+    df = pd.DataFrame.from_dict(results_count, dtype=np.int32)
     for tag in df.columns:
         p_tag = 'pred_'+tag
         if p_tag not in df.index:
-            df.loc[p_tag,:] = [NaN] * (len(df.columns))
+            df.loc[p_tag,:] = [np.NaN] * (len(df.columns))
     df.sort_index(axis=0, inplace=True)
     df.sort_index(axis=1, inplace=True)
     df.fillna(0, inplace=True)
     df.to_csv('resultados_bigram.csv')
     
     with open("metrics_bigram.json", 'w') as f:
-        json.dump(metrics.extract_metrics_from_confusion_matrix(df.values), f,indent=4, sort_keys=True)
+        metrics_dict = metrics.extract_metrics_from_confusion_matrix(df.values)
+        json.dump(metrics_dict, f,indent=4, sort_keys=True)
+    metrics_df = pd.DataFrame.from_dict(metrics_dict)
+    metrics_df.index = df.index
+    metrics_df.to_csv('metrics_bigram.csv')
 
 
 if __name__ == "__main__":
