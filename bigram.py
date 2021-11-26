@@ -10,42 +10,42 @@ import metrics
 
 MIN_QTD = 10
 
-token_count = {}
+token_bi_count = {}
 token_uni_count = {}
 
 known_tags = set()
 
-token_total = {}
-token_af_token_total = {}
+token_uni_total = {}
+token_bi_total = {}
 handle_unknown = ""
 
 results_count = {}
 
-def pair_is_valid(pair):
+def pair_is_not_valid(pair):
     return len(pair) < 3
 
 def preprocess_token(token):
     return token.lower()
 
 def token_is_known(token):
-    return token in token_count
+    return token in token_bi_count
 
 def token_is_known_after_token(token, previous_token):
-    return previous_token in token_count[token]
+    return previous_token in token_bi_count[token]
 
 def token_after_token_is_known_with_tag(token, previous_token, tag, previous_tag):
-    return tag in token_count[token][previous_token]
+    return tag in token_bi_count[token][previous_token]
 
 def train_handle_token_with_known_tag(token, previous_token, tag, previous_tag):
-    token_count[token][previous_token][tag] += 1
-    token_af_token_total[token][previous_token] += 1
-    token_total[token] += 1
+    token_bi_count[token][previous_token][tag] += 1
+    token_bi_total[token][previous_token] += 1
+    token_uni_total[token] += 1
 
 def train_handle_token_with_unknown_tag(token, previous_token, tag, previous_tag):
     known_tags.add(tag)
-    token_count[token][previous_token][tag] = 1
-    token_af_token_total[token][previous_token] += 1
-    token_total[token] += 1
+    token_bi_count[token][previous_token][tag] = 1
+    token_bi_total[token][previous_token] += 1
+    token_uni_total[token] += 1
 
 def train_handle_known_token(token, previous_token, tag, previous_tag):
     if token_is_known_after_token(token, previous_token):
@@ -54,49 +54,49 @@ def train_handle_known_token(token, previous_token, tag, previous_tag):
         else: 
             train_handle_token_with_unknown_tag(token, previous_token, tag, previous_tag)
     else:
-        token_count[token][previous_token] = {}
-        token_af_token_total[token][previous_token] = 0
+        token_bi_count[token][previous_token] = {}
+        token_bi_total[token][previous_token] = 0
         train_handle_token_with_unknown_tag(token, previous_token, tag, previous_tag)
 
 
 def train_handle_unknown_token(token, previous_token, tag, previous_tag):
-    token_count[token] = {}
-    token_count[token][previous_token] = {}
-    token_count[token][previous_token][tag] = 1
-    token_af_token_total[token] = {}
-    token_af_token_total[token][previous_token] = 1
-    token_total[token] = 1
+    token_bi_count[token] = {}
+    token_bi_count[token][previous_token] = {}
+    token_bi_count[token][previous_token][tag] = 1
+    token_bi_total[token] = {}
+    token_bi_total[token][previous_token] = 1
+    token_uni_total[token] = 1
     known_tags.add(tag)
 
 def compute_unknow_handle():
     tags = {}
-    for token in token_total:
+    for token in token_uni_total:
         token_uni_count[token] = {}
-        if token_total[token] < MIN_QTD:
-            for p_token in token_count[token]:
-                for tag in token_count[token][p_token]:
+        if token_uni_total[token] < MIN_QTD:
+            for p_token in token_bi_count[token]:
+                for tag in token_bi_count[token][p_token]:
                     if tag in tags:
-                        tags[tag] += token_count[token][p_token][tag]
+                        tags[tag] += token_bi_count[token][p_token][tag]
                     else:
-                        tags[tag] = token_count[token][p_token][tag]
+                        tags[tag] = token_bi_count[token][p_token][tag]
                     if tag in token_uni_count[token]:
-                        token_uni_count[token][tag] += token_count[token][p_token][tag]
+                        token_uni_count[token][tag] += token_bi_count[token][p_token][tag]
                     else:
-                        token_uni_count[token][tag] = token_count[token][p_token][tag]
+                        token_uni_count[token][tag] = token_bi_count[token][p_token][tag]
         else:
-            for p_token in token_count[token]:
-                for tag in token_count[token][p_token]:
+            for p_token in token_bi_count[token]:
+                for tag in token_bi_count[token][p_token]:
                     if tag in token_uni_count[token]:
-                        token_uni_count[token][tag] += token_count[token][p_token][tag]
+                        token_uni_count[token][tag] += token_bi_count[token][p_token][tag]
                     else:
-                        token_uni_count[token][tag] = token_count[token][p_token][tag]
+                        token_uni_count[token][tag] = token_bi_count[token][p_token][tag]
         token_uni_count[token]['prediction'] = max(token_uni_count[token].items(), key=operator.itemgetter(1))[0]
 
             
     return max(tags.items(), key=operator.itemgetter(1))[0]
 
 def predict_tag_for_token_with_known_previous_token(token, previous_token, previous_p_tag):
-    return max(token_count[token][previous_token].items(), key=operator.itemgetter(1))[0]
+    return max(token_bi_count[token][previous_token].items(), key=operator.itemgetter(1))[0]
 
 def predict_tag_for_token_with_unknown_previous_token(token, previous_p_tag):
     return token_uni_count[token]['prediction']
@@ -141,71 +141,66 @@ def test_handle_known_token(token, previous_token, tag, previous_p_tag):
 def token_is_CD_tag(token, tag):
     return re.match("\d*\.?\d+", token)
 
-def handle_CD_token(token, tag):
-    p_tag = "CD"
-    handle_predicted_tag(p_tag, tag)
-    return "CD"
-
 def predict_unknow_tag_using_previous_token_p_tag(previous_token, previous_p_tag, handle_unknown):
     #TODO
     return handle_unknown
 
 def test_handle_unknown_token(token, previous_token, tag, previous_p_tag, handle_unknown):
     if token_is_CD_tag(token, tag):
-        return handle_CD_token(token, tag)
+        handle_predicted_tag("CD", tag)
+        return "CD"
     else:
         p_tag = predict_unknow_tag_using_previous_token_p_tag(previous_token, previous_p_tag, handle_unknown)
         handle_predicted_tag(p_tag, tag)
         return p_tag
 
 def main():
-
     if len(sys.argv) != 3:
         print("Informe apenas o nome do arquivo do corpus e o arquivo alvo do tagging")
         sys.exit()
 
     with open(sys.argv[1], 'r') as file:
-        train = re.split('\s|\n', file.read())
+        train_lines = file.readlines()
 
     with open(sys.argv[2], 'r') as file:
-        test = re.split('\s|\n', file.read())
+        test_lines = file.readlines()
 
-    previous_token = '.'
-    previous_tag = '.'
-
-    for pair in train:
-        if pair_is_valid(pair):
-            continue
-        token, tag = pair.split('_')
-        token = preprocess_token(token)
-        if token_is_known(token):
-            train_handle_known_token(token, previous_token, tag, previous_tag)
-        else:
-            train_handle_unknown_token(token, previous_token, tag, previous_tag)
-        previous_token = token
-        previous_tag = tag
+    for line in train_lines:
+        previous_token = 'PS'
+        previous_tag = 'PS'
+        for pair in re.split('\s', line):
+            if pair_is_not_valid(pair):
+                continue
+            token, tag = pair.split('_')
+            token = preprocess_token(token)
+            if token_is_known(token):
+                train_handle_known_token(token, previous_token, tag, previous_tag)
+            else:
+                train_handle_unknown_token(token, previous_token, tag, previous_tag)
+            previous_token = token
+            previous_tag = tag
 
     handle_unknown = compute_unknow_handle()
-
-    previous_token = '.'
-    previous_p_tag = '.'
 
     predicted = []
     expected = []
 
-    for pair in test:
-        if pair_is_valid(pair):
-            continue
-        token, tag = pair.split('_')
-        token = preprocess_token(token)
-        if token_is_known(token):
-            p_tag = test_handle_known_token(token, previous_token, tag, previous_p_tag)
-        else:
-            p_tag = test_handle_unknown_token(token, previous_token, tag, previous_p_tag, handle_unknown)
-        predicted.append(p_tag)
-        expected.append(tag)
-        previous_token = token
-        previous_p_tag = p_tag
+    for line in test_lines:
+        previous_token = 'PS'
+        previous_p_tag = 'PS'
+        for pair in re.split('\s', line):
+            if pair_is_not_valid(pair):
+                continue
+            token, tag = pair.split('_')
+            token = preprocess_token(token)
+            if token_is_known(token):
+                p_tag = test_handle_known_token(token, previous_token, tag, previous_p_tag)
+            else:
+                p_tag = test_handle_unknown_token(token, previous_token, tag, previous_p_tag, handle_unknown)
+            predicted.append(p_tag)
+            expected.append(tag)
+            previous_token = token
+            previous_p_tag = p_tag
 
     pred_expc = pd.DataFrame.from_dict({'predicted': predicted, 'expected':expected})
     pred_expc.to_csv('pred_expc_bigram.csv', index=False)
