@@ -25,6 +25,7 @@ def pair_is_not_valid(pair):
     return len(pair) < 3
 
 def preprocess_token(token):
+    return token
     return token.lower()
 
 def token_is_known(token):
