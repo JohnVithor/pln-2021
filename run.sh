@@ -18,3 +18,5 @@ python3 bigram.py data/secs0-18-training data/secs22-24-testing
 mv metrics_bigram.csv metrics_bigram_test.csv
 mv pred_expc_bigram.csv pred_expc_bigram_test.csv
 mv resultados_bigram.csv resultados_bigram_test.csv
+
+python3 visualization.py
