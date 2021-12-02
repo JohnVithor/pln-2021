@@ -5,7 +5,6 @@ import re
 import numpy as np
 import pandas as pd
 import operator
-import json
 import metrics
 
 MIN_QTD = 10
