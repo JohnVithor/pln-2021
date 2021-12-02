@@ -159,9 +159,7 @@ def main():
     df.fillna(0, inplace=True)
     df.to_csv('resultados_unigram.csv')
     
-    with open("metrics_unigram.json", 'w') as f:
-        metrics_dict = metrics.extract_metrics_from_confusion_matrix(df.values)
-        json.dump(metrics_dict, f,indent=4, sort_keys=True)
+    metrics_dict = metrics.extract_metrics_from_confusion_matrix(df.values)
     metrics_df = pd.DataFrame.from_dict(metrics_dict)
     metrics_df.index = df.index
     metrics_df.to_csv('metrics_unigram.csv')
