@@ -11,6 +11,12 @@ def extract_metrics_from_confusion_matrix(matrix):
     FN = FN.astype(float)
     TP = TP.astype(float)
     TN = TN.astype(float)
+
+    FP = np.append(FP, [FP.sum()])
+    FN = np.append(FN, [FN.sum()])
+    TP = np.append(TP, [TP.sum()])
+    TN = np.append(TN, [TN.sum()])
+
     # Sensitivity, hit rate, recall, or true positive rate
     TPR = TP/(TP+FN)
     # Specificity or true negative rate

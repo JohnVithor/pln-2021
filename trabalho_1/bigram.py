@@ -9,6 +9,8 @@ import metrics
 
 MIN_QTD = 10
 
+sentenceStartMarker = '__SS__'
+
 token_bi_count = {}
 token_uni_count = {}
 
@@ -24,8 +26,8 @@ def pair_is_not_valid(pair):
     return len(pair) < 3
 
 def preprocess_token(token):
-    return token
     return token.lower()
+    return token
 
 def token_is_known(token):
     return token in token_bi_count
@@ -155,8 +157,8 @@ def test_handle_unknown_token(token, previous_token, tag, previous_p_tag, handle
         return p_tag
 
 def main():
-    if len(sys.argv) != 3:
-        print("Informe apenas o nome do arquivo do corpus e o arquivo alvo do tagging")
+    if len(sys.argv) != 4:
+        print("Informe o nome do arquivo do corpus, o arquivo alvo do tagging e o separador entre tag e token")
         sys.exit()
 
     with open(sys.argv[1], 'r') as file:
@@ -165,13 +167,15 @@ def main():
     with open(sys.argv[2], 'r') as file:
         test_lines = file.readlines()
 
+    sep = sys.argv[3]   
+
     for line in train_lines:
-        previous_token = 'PS'
-        previous_tag = 'PS'
+        previous_token = sentenceStartMarker
+        previous_tag = sentenceStartMarker
         for pair in re.split('\s', line):
             if pair_is_not_valid(pair):
                 continue
-            token, tag = pair.split('_')
+            token, tag = pair.split(sep)
             token = preprocess_token(token)
             if token_is_known(token):
                 train_handle_known_token(token, previous_token, tag, previous_tag)
@@ -186,12 +190,12 @@ def main():
     expected = []
 
     for line in test_lines:
-        previous_token = 'PS'
-        previous_p_tag = 'PS'
+        previous_token = sentenceStartMarker
+        previous_p_tag = sentenceStartMarker
         for pair in re.split('\s', line):
             if pair_is_not_valid(pair):
                 continue
-            token, tag = pair.split('_')
+            token, tag = pair.split(sep)
             token = preprocess_token(token)
             if token_is_known(token):
                 p_tag = test_handle_known_token(token, previous_token, tag, previous_p_tag)
@@ -217,7 +221,9 @@ def main():
 
     metrics_dict = metrics.extract_metrics_from_confusion_matrix(df.values)
     metrics_df = pd.DataFrame.from_dict(metrics_dict)
-    metrics_df.index = df.index
+    index = list(df.index)
+    index.append('total')
+    metrics_df.index = index
     metrics_df.to_csv('metrics_bigram.csv')
 
 
