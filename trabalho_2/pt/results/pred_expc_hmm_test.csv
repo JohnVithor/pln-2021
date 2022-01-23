@@ -127,7 +127,7 @@ n,n
 prp,prp
 art,art
 «,«
-v-inf,prop
+prop,prop
 »,»
 .,.
 art,art
@@ -353,8 +353,8 @@ prop,prop
 prop,prop
 },}
 ",",","
-adv,pron-indp
-adj,v-fin
+conj-s,pron-indp
+n,v-fin
 adj,adj
 n,n
 .,.
@@ -465,8 +465,8 @@ n,n
 »,»
 ",",","
 v-fin,v-fin
-pron-pers,art
-v-inf,n
+art,art
+n,n
 prop,prop
 ",",","
 prp,prp
@@ -1605,7 +1605,7 @@ v-inf,prop
 art,art
 adj,adj
 v-pcp,n
-adj,adj
+n,adj
 prp,prp
 art,art
 prop,prop
@@ -1653,7 +1653,7 @@ adj,adj
 prp,prp
 v-inf,v-inf
 art,art
-adj,n
+n,n
 adj,adj
 prp,prp
 art,art
@@ -1774,7 +1774,7 @@ v-fin,v-fin
 adj,adj
 prp,prp
 art,art
-adj,n
+n,n
 adj,adj
 ;,;
 «,«
@@ -2349,7 +2349,7 @@ adj,adj
 conj-s,conj-s
 art,art
 n,n
-adj,adj
+n,adj
 adv,adv
 v-fin,v-fin
 adv,adv
@@ -2694,7 +2694,7 @@ art,art
 n,n
 },}
 ",",","
-adj,n
+n,n
 prp,prp
 n,n
 prp,prp
@@ -2978,7 +2978,7 @@ v-fin,v-fin
 art,art
 n,n
 «,«
-adj,n
+n,n
 »,»
 prp,prp
 art,art
@@ -5433,7 +5433,7 @@ v-fin,v-fin
 prop,prop
 ",",","
 art,art
-v-inf,n
+n,n
 prp,prp
 n,n
 adj,adj
@@ -5786,7 +5786,7 @@ art,art
 prop,prop
 .,.
 art,art
-adj,n
+n,n
 prp,prp
 art,art
 prop,prop
@@ -6750,7 +6750,7 @@ n,n
 v-fin,v-fin
 prp,prp
 art,art
-adj,prop
+prop,prop
 conj-c,conj-c
 v-fin,v-fin
 adv,adv
@@ -9109,7 +9109,7 @@ adv,adv
 prp,prp
 art,art
 «,«
-adj,prop
+prop,prop
 »,»
 ",",","
 v-pcp,v-pcp
@@ -9298,7 +9298,7 @@ n,n
 prp,prp
 art,art
 n,n
-adj,adj
+n,adj
 ",",","
 art,art
 n,n
@@ -9536,7 +9536,7 @@ art,art
 n,n
 prp,prp
 art,art
-adj,n
+n,n
 .,.
 prp,prp
 art,art
@@ -9579,7 +9579,7 @@ n,n
 prp,prp
 art,art
 pron-det,pron-det
-v-inf,n
+n,n
 .,.
 n,n
 --,--
@@ -9920,7 +9920,7 @@ art,art
 n,n
 prp,prp
 pron-det,pron-det
-v-inf,n
+n,n
 v-pcp,v-pcp
 ?,?
 adv,pron-det
@@ -13275,7 +13275,7 @@ n,n
 prp,prp
 art,art
 n,n
-adj,adj
+n,adj
 prp,prp
 art,art
 prop,prop
@@ -13697,7 +13697,7 @@ n,n
 v-fin,v-fin
 art,art
 n,n
-v-inf,adj
+n,adj
 »,»
 .,.
 prp,prp
@@ -13771,7 +13771,7 @@ conj-c,conj-c
 prp,prp
 art,art
 n,n
-adj,adj
+n,adj
 adj,adj
 .,.
 art,art
@@ -14362,7 +14362,7 @@ n,n
 prp,prp
 art,art
 «,«
-adj,prop
+prop,prop
 »,»
 .,.
 v-fin,v-fin
@@ -14451,7 +14451,7 @@ prop,prop
 pron-indp,pron-indp
 v-fin,v-fin
 pron-det,pron-det
-v-inf,n
+n,n
 prp,prp
 art,art
 n,n
@@ -14945,7 +14945,7 @@ prop,prop
 --,--
 prop,prop
 ",",","
-adj,n
+n,n
 prp,prp
 art,art
 prop,prop
@@ -14997,7 +14997,7 @@ art,art
 adj,n
 conj-c,conj-c
 art,art
-v-inf,n
+n,n
 pron-indp,pron-indp
 v-fin,v-fin
 adv,adv
@@ -15371,7 +15371,7 @@ adj,adj
 ",",","
 v-pcp,adj
 conj-c,conj-c
-v-inf,adj
+n,adj
 .,.
 art,art
 n,n
@@ -15580,7 +15580,7 @@ prp,prp
 art,art
 n,n
 prp,prp
-v-inf,v-inf
+n,v-inf
 pron-pers,pron-pers
 prp,prp
 art,art
@@ -16023,7 +16023,7 @@ n,n
 },}
 conj-c,conj-c
 «,«
-adj,prop
+prop,prop
 »,»
 {,{
 prop,prop
@@ -16896,7 +16896,7 @@ prop,prop
 art,art
 n,n
 conj-c,conj-c
-adj,n
+n,n
 prop,prop
 v-fin,v-fin
 prp,prp
@@ -17445,7 +17445,7 @@ prp,prp
 v-inf,v-inf
 art,art
 n,n
-adj,adj
+n,adj
 ",",","
 prop,prop
 v-fin,v-fin
@@ -17702,7 +17702,7 @@ n,n
 conj-c,conj-c
 v-pcp,prop
 {,{
-v-inf,n
+n,n
 },}
 ",",","
 pron-det,pron-det
@@ -18325,7 +18325,7 @@ n,n
 num,num
 v-fin,v-fin
 art,art
-v-inf,n
+n,n
 prp,prp
 n,n
 prp,prp
@@ -18343,7 +18343,7 @@ prp,prp
 art,art
 pron-det,pron-det
 n,n
-v-inf,adj
+n,adj
 prp,prp
 n,n
 ;,;
@@ -18554,7 +18554,7 @@ adj,n
 v-fin,v-fin
 art,art
 n,n
-adj,adj
+n,adj
 pron-indp,pron-indp
 adv,adv
 adv,adv
@@ -18882,7 +18882,7 @@ adv,adv
 v-fin,v-fin
 v-inf,v-inf
 adv,adv
-adj,n
+n,n
 prp,prp
 art,art
 prop,prop
@@ -19915,10 +19915,10 @@ n,n
 v-fin,v-fin
 prp,prp
 art,art
-adj,n
+n,n
 v-fin,prop
 ",",","
-v-inf,n
+n,n
 prop,adj
 prp,prp
 art,art
@@ -19988,7 +19988,7 @@ n,adj
 ",",","
 prp,prp
 art,art
-adj,n
+n,n
 .,.
 pron-det,pron-det
 n,n
@@ -20308,7 +20308,7 @@ prop,prop
 {,{
 prop,prop
 ",",","
-adj,adj
+n,adj
 },}
 v-fin,v-fin
 adv,adv
@@ -20462,8 +20462,8 @@ pron-det,pron-det
 adj,adj
 n,n
 prp,prp
-n,prop
-adj,adj
+prop,prop
+n,adj
 .,.
 n,n
 adj,adj
@@ -20949,7 +20949,7 @@ art,art
 prop,prop
 .,.
 art,art
-v-inf,n
+n,n
 v-fin,v-fin
 adj,adj
 prp,prp
@@ -21168,7 +21168,7 @@ adv,pp
 prp,prp
 art,art
 n,n
-adj,adj
+n,adj
 prp,prp
 «,«
 prop,prop
@@ -21282,7 +21282,7 @@ n,n
 .,.
 pron-pers,pron-pers
 v-fin,v-fin
-adj,adj
+n,adj
 ",",","
 v-fin,v-fin
 art,art
@@ -22625,7 +22625,7 @@ n,n
 .,.
 art,art
 v-pcp,v-pcp
-v-inf,n
+n,n
 v-fin,v-fin
 v-pcp,v-pcp
 prp,prp
@@ -22760,7 +22760,7 @@ conj-c,conj-c
 v-fin,v-fin
 art,art
 v-pcp,v-pcp
-v-inf,n
+n,n
 .,.
 art,art
 n,n
@@ -23341,7 +23341,7 @@ n,n
 n,adj
 },}
 conj-c,conj-c
-adj,adj
+n,adj
 {,{
 v-pcp,v-pcp
 },}
@@ -23523,7 +23523,7 @@ n,n
 prp,prp
 prop,prop
 adv,adv
-adj,adj
+n,adj
 prp,prp
 pron-det,pron-det
 prp,prp
@@ -23770,8 +23770,8 @@ n,n
 adj,adj
 adv,adv
 pron-det,pron-det
-v-inf,n
-adj,v-fin
+n,n
+n,v-fin
 ",",","
 adv,adv
 ",",","
@@ -24009,7 +24009,7 @@ n,n
 v-pcp,v-pcp
 n,prop
 ",",","
-adj,n
+n,n
 prp,prp
 art,art
 prop,prop
@@ -26645,7 +26645,7 @@ prp,adv
 n,n
 .,.
 art,art
-adj,n
+n,n
 prop,prop
 v-fin,v-fin
 art,art
@@ -26919,7 +26919,7 @@ adj,n
 prp,prp
 v-inf,v-inf
 art,art
-v-inf,n
+n,n
 prp,prp
 v-inf,v-inf
 art,art
@@ -27291,7 +27291,7 @@ art,art
 n,n
 prp,prp
 art,art
-adj,n
+n,n
 prp,prp
 n,n
 adj,adj
@@ -27747,7 +27747,7 @@ art,art
 n,n
 prp,prp
 art,art
-adj,prop
+prop,prop
 v-fin,v-fin
 prp,prp
 art,art
@@ -28893,7 +28893,7 @@ prop,prop
 ",",","
 prop,prop
 conj-c,conj-c
-v-inf,prop
+prop,prop
 .,.
 adv,adv
 v-fin,v-fin
@@ -28942,7 +28942,7 @@ v-fin,v-fin
 prop,prop
 ",",","
 art,art
-adj,n
+n,n
 pron-indp,pron-indp
 v-fin,v-fin
 prp,prp
@@ -29090,8 +29090,8 @@ n,v-fin
 num,num
 n,n
 {,{
-art,art
-v-inf,n
+num,art
+n,n
 prp,prp
 num,num
 n,n
@@ -29348,8 +29348,8 @@ prp,prp
 art,art
 n,n
 .,.
-adv,prp
-adj,adj
+prp,prp
+n,adj
 pron-indp,pron-indp
 v-fin,v-fin
 ",",","
@@ -29452,7 +29452,7 @@ n,n
 art,art
 n,n
 prp,prp
-v-inf,v-inf
+n,v-inf
 «,«
 adj,n
 »,»
@@ -30279,7 +30279,7 @@ prp,prp
 pron-det,pron-det
 n,n
 ",",","
-v-inf,n
+n,n
 adv,adv
 prp,prp
 n,n
@@ -30400,7 +30400,7 @@ conj-c,conj-c
 adv,adv
 prp,prp
 art,art
-v-inf,n
+n,n
 .,.
 n,v-fin
 pron-pers,pron-pers
@@ -30603,7 +30603,7 @@ n,n
 num,num
 ",",","
 prp,prp
-adj,prop
+prop,prop
 ",",","
 prp,prp
 art,art
@@ -31083,7 +31083,7 @@ n,n
 adv,adv
 adv,adv
 conj-s,conj-s
-v-inf,adj
+n,adj
 .,.
 n,pron-indp
 prp,adv
@@ -31136,7 +31136,7 @@ n,adj
 ",",","
 v-fin,v-fin
 art,art
-adj,n
+n,n
 prp,prp
 art,art
 n,n
@@ -32165,7 +32165,7 @@ adj,adj
 n,n
 ",",","
 art,art
-v-inf,n
+n,n
 v-fin,v-fin
 v-ger,v-ger
 ",",","
@@ -32540,7 +32540,7 @@ art,art
 n,n
 adv,adv
 adj,adj
-v-inf,adj
+n,adj
 prp,prp
 art,art
 n,n
@@ -32622,7 +32622,7 @@ art,art
 n,n
 num,num
 adv,adv
-adj,adj
+n,adj
 conj-c,conj-c
 ",",","
 adv,adv
@@ -32704,7 +32704,7 @@ n,n
 prp,prp
 art,art
 n,n
-adj,adj
+n,adj
 .,.
 n,n
 pron-indp,pron-indp
@@ -35649,7 +35649,7 @@ prp,prp
 n,n
 n,adj
 v-fin,v-fin
-adj,adj
+n,adj
 »,»
 ",",","
 v-fin,v-fin
@@ -35953,8 +35953,8 @@ prop,prop
 »,»
 ",",","
 v-fin,v-fin
-pron-pers,art
-v-inf,n
+art,art
+n,n
 adj,adj
 ",",","
 v-ger,v-ger
@@ -36033,7 +36033,7 @@ v-inf,v-inf
 adj,n
 art,art
 n,n
-adj,adj
+n,adj
 n,adj
 prop,prop
 v-fin,v-fin
@@ -36206,7 +36206,7 @@ prp,prp
 art,art
 prop,prop
 art,art
-adj,n
+n,n
 adj,adj
 ",",","
 num,num
@@ -36761,7 +36761,7 @@ n,n
 adj,adj
 prp,prp
 pron-det,pron-det
-v-inf,n
+n,n
 conj-c,conj-c
 n,n
 adj,adj
@@ -36929,7 +36929,7 @@ n,n
 n,prop
 ",",","
 art,art
-adj,adj
+n,adj
 ",",","
 v-fin,v-fin
 art,art
@@ -37000,7 +37000,7 @@ n,n
 .,.
 art,art
 adv,adv
-adj,n
+n,n
 prp,prp
 art,art
 prop,prop

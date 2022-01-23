@@ -177,18 +177,17 @@ def handle_unknown_token(token):
        token[-3:] == 'ida' or token[-4:] == 'idas' or token[-3:] == 'ido' or token[-4:] == 'idos' or \
        token[-3:] == 'ída' or token[-4:] == 'ídas' or token[-3:] == 'ído' or token[-4:] == 'ídos':
         return 'v-pcp'
-    if token[-2:] == 'ar' or token[-2:] == 'er' or token[-2:] == 'ir' or token[-2:] == 'or' or \
-       token[-4:] == 'arem' or token[-4:] == 'erem' or token[-4:] == 'irem' or token[-4:] == 'orem':
+    if token[-2:] == 'ar'   or token[-2:] == 'er'   or token[-2:] == 'ir' or \
+       token[-4:] == 'arem' or token[-4:] == 'erem' or token[-4:] == 'irem' :
         return 'v-inf'
-    if token[-3:] == 'ava' or token[-4:] == 'imos' or token[-4:] == 'aram' or token[-2:] == 'emos' or \
-       token[-4:] == 'avam' or token[-4:] == 'amos' or token[-2:] == 'ou' or token[-4:] == 'ia':
+    if token[-3:] == 'ava'  or token[-4:] == 'imos' or token[-4:] == 'aram' or token[-2:] == 'emos' or \
+       token[-4:] == 'avam' or token[-4:] == 'amos' or token[-2:] == 'ou'   or token[-4:] == 'ia':
         return 'v-fin'
     if token[-5:] == 'mente':
         return 'adv'
-    if token[-4:] == 'ento' or token[-5:] == 'entos' or token[-4:] == 'ável' or token[-5:] == 'áveis' or \
-       token[-4:] == 'ante' or token[-5:] == 'antes' or token[-4:] == 'esco' or token[-5:] == 'escos' or \
-       token[-4:] == 'ível' or token[-5:] == 'íveis' or token[-3:] == 'ano' or token[-3:] == 'ino' or \
-       token[-5:] == 'dente' or token[-4:] == 'ista':
+    if token[-4:] == 'ento'  or token[-5:] == 'entos' or token[-4:] == 'ável' or token[-5:] == 'áveis' or \
+       token[-4:] == 'ante'  or token[-5:] == 'antes' or token[-4:] == 'esco' or token[-5:] == 'escos' or \
+       token[-4:] == 'ível'  or token[-5:] == 'íveis' or token[-3:] == 'ano'  or token[-3:] == 'ino':
         return 'adj'
     if token[-4:] == 'ismo' or token[-5:] == 'ismos' or token[-5:] == 'idade' or token[-6:] == 'idades':
         return 'n'
@@ -240,6 +239,7 @@ def save_results(result):
 
 @numba.jit(nopython=True, nogil=True, parallel=True)
 def viterbi_loop(sentences_array, tags_array, train_vocab_dict, train_tags_dict, transition_matrix, primeira_tag_prob, emission_matrix, train_tags, pred_tags_array, expc_tags_array):
+    sentences_precision = np.zeros(len(sentences_array))
     for i in numba.prange(len(sentences_array)):
         words_sequence_index = prepare_viterbi_input(list(sentences_array[i][1:]), train_vocab_dict, train_tags_dict)
         s = viterbi_log(transition_matrix, primeira_tag_prob, emission_matrix, words_sequence_index)
@@ -248,7 +248,12 @@ def viterbi_loop(sentences_array, tags_array, train_vocab_dict, train_tags_dict,
             preds_tags.append(train_tags[s[j]])
         pred_tags_array[i] = preds_tags
         expc_tags_array[i] = tags_array[i][1:]
-    return pred_tags_array, expc_tags_array
+        hits = 0
+        for j in numba.prange(len(expc_tags_array[i])):
+            if pred_tags_array[i][j] == expc_tags_array[i][j]:
+                hits += 1
+        sentences_precision[i] = hits / len(pred_tags_array[i])
+    return pred_tags_array, expc_tags_array, sentences_precision
 
 def run_viterbi(word_sequence, tags_sequence, sentenceStartMarker, train_vocab_dict, train_tags_dict, transition_matrix, primeira_tag_prob, emission_matrix, train_tags):
     words_sequence_array = np.array(word_sequence)
@@ -274,9 +279,9 @@ def run_viterbi(word_sequence, tags_sequence, sentenceStartMarker, train_vocab_d
     pred_tags_array = tags_array.copy()
     expc_tags_array = tags_array.copy()
 
-    predictions_mat, expectations_mat = viterbi_loop(sentences_lists[:10], tags_array[:10], train_vocab_dict, train_tags_dict, transition_matrix, primeira_tag_prob, emission_matrix, train_tags, pred_tags_array, expc_tags_array)
+    predictions_mat, expectations_mat, sentences_precision = viterbi_loop(sentences_lists[:10], tags_array[:10], train_vocab_dict, train_tags_dict, transition_matrix, primeira_tag_prob, emission_matrix, train_tags, pred_tags_array, expc_tags_array)
 
-    predictions_mat, expectations_mat = viterbi_loop(sentences_lists, tags_array, train_vocab_dict, train_tags_dict, transition_matrix, primeira_tag_prob, emission_matrix, train_tags, pred_tags_array, expc_tags_array)
+    predictions_mat, expectations_mat, sentences_precision = viterbi_loop(sentences_lists, tags_array, train_vocab_dict, train_tags_dict, transition_matrix, primeira_tag_prob, emission_matrix, train_tags, pred_tags_array, expc_tags_array)
 
     predictions = []
     for preds in predictions_mat:
@@ -286,6 +291,19 @@ def run_viterbi(word_sequence, tags_sequence, sentenceStartMarker, train_vocab_d
         expectations.extend(preds)
     pred_expc = pd.DataFrame.from_dict({'predictions': predictions, 'expectations':expectations})
     pred_expc.to_csv('pred_expc_hmm.csv', index=False)
+
+    sentences = []
+    for s in sentences_lists:
+        sentence = ''
+        for w in s:
+            sentence += w + ' '
+        sentences.append(sentence)
+    sentences.append('total')
+    sentences_precision = list(sentences_precision)
+    sentences_precision.append(np.mean(sentences_precision))
+
+    sentences_precision = pd.DataFrame.from_dict({'precision': sentences_precision, 'sentence': sentences})
+    sentences_precision.to_csv('sentences_precision_hmm.csv', index=False)
     save_results(process_results(expectations, predictions))
 
 
