@@ -1,6 +1,5 @@
 import sys
 import numpy as np
-import time
 import numba
 import re
 from numba.core.errors import NumbaDeprecationWarning, NumbaPendingDeprecationWarning
@@ -11,82 +10,9 @@ import pandas as pd
 warnings.simplefilter('ignore', category=NumbaDeprecationWarning)
 warnings.simplefilter('ignore', category=NumbaPendingDeprecationWarning)
 
-if len(sys.argv) != 4:
-    print("Informe o caminho para o arquivo de treino, seguido pelo caminho para o arquivo de teste e por fim a string utilizada para separar os pares tag e token")
-    sys.exit()
-
-sep = sys.argv[3]
-train_pairs = []
-train_vocab = set()
-train_tags = set()
-
 sentenceStartMarker = '__SS__'
 
-primeira_tag = []
-primeira = True
-with open(sys.argv[1], 'r') as file:
-    for line in file:
-        token, tag = sentenceStartMarker, sentenceStartMarker
-        train_pairs.append((token, tag))
-        primeira = True
-        for pair in re.split(' ', line):
-            if len(pair) > 2:
-                token, tag = pair.split(sep)
-                tag = tag.strip()
-                if primeira:
-                    primeira = False
-                    primeira_tag.append(tag)
-                train_pairs.append((token, tag))
-                train_vocab.add(token)
-                train_tags.add(tag)
 
-train_words_sequence = [pair[0] for pair in train_pairs]
-train_tags_sequence = [pair[1] for pair in train_pairs]
-train_tags = sorted(list(train_tags))
-train_vocab = sorted(list(train_vocab))
-
-train_tags_dict = numba.typed.Dict()
-train_vocab_dict = numba.typed.Dict()
-primeira_tag_dict = {}
-
-for i, tag in enumerate(train_tags):
-    train_tags_dict[tag] = i
-    primeira_tag_dict[tag] = 0
-
-for i, w in enumerate(train_vocab):
-    train_vocab_dict[w] = i
-
-for tag in primeira_tag:
-    primeira_tag_dict[tag] += 1
-
-for tag in primeira_tag_dict:
-    primeira_tag_dict[tag] /= len(primeira_tag)
-
-primeira_tag_prob = np.zeros(len(train_tags))
-for i in range(len(train_tags)):
-    primeira_tag_prob[i] = primeira_tag_dict[train_tags[i]]
-
-test_pairs = []
-test_vocab = set()
-test_tags = set()
-with open(sys.argv[2], 'r') as file:
-    for line in file:
-        token, tag = sentenceStartMarker, sentenceStartMarker
-        test_pairs.append((token, tag))
-        for pair in re.split(' ', line):
-            if len(pair) > 2:
-                token, tag = pair.split(sep)
-                tag = tag.strip()
-                test_pairs.append((token, tag))
-                test_vocab.add(token)
-                test_tags.add(tag)
-
-test_words_sequence = [pair[0] for pair in test_pairs]
-test_tags_sequence = [pair[1] for pair in test_pairs]
-test_tags = sorted(list(test_tags))
-test_vocab = sorted(list(test_vocab))
-
-# Compute Emission Probability
 @numba.jit(nopython=True, nogil=True)
 def get_emission_matrix(train_tags_sequence, train_words_sequence, states, train_vocab):
     emission_matrix = np.zeros((len(states), len(train_vocab)))
@@ -101,22 +27,7 @@ def get_emission_matrix(train_tags_sequence, train_words_sequence, states, train
         emission_matrix[i, :] /= states_count[i]
     return emission_matrix
 
-a = numba.typed.Dict()
-b = numba.typed.Dict()
 
-for i, tag in enumerate(list(set(train_tags_sequence[:2]))):
-    a[tag]=i
-
-for i, w in enumerate(list(set(train_words_sequence[:2]))):
-    b[w]=i
-
-emission_matrix = get_emission_matrix(train_tags_sequence[:2], train_words_sequence[:2], a, b)
-
-emission_matrix = get_emission_matrix(train_tags_sequence, train_words_sequence, train_tags_dict, train_vocab_dict)
-
-# creating t x t transition matrix of tags, t= no of tags
-# Matrix(i, j) represents P(jth tag after the ith tag)
-# @numba.jit(nopython=True, nogil=True, parallel=True, fastmath=True)
 def create_transition_matrix(train_tags:np.ndarray, train_tags_sequence:np.ndarray):
     tags_matrix = np.zeros((len(train_tags), len(train_tags)), dtype=np.float32)
     for i in numba.prange(len(train_tags)):
@@ -129,9 +40,6 @@ def create_transition_matrix(train_tags:np.ndarray, train_tags_sequence:np.ndarr
             tags_matrix[i, j] = count_t2_t1/count_t1
     return tags_matrix
 
-transition_matrix = create_transition_matrix(np.array(list(set(train_tags_sequence[:2]))), np.array(train_tags_sequence[:2]))
-
-transition_matrix = create_transition_matrix(np.array(train_tags), np.array(train_tags_sequence))
 
 @numba.jit(nopython=True, nogil=True)
 def viterbi_log(transition_matrix, initial_probs, emission_matrix, words_sequence_index):
@@ -164,6 +72,7 @@ def viterbi_log(transition_matrix, initial_probs, emission_matrix, words_sequenc
     for n in range(number_words-2, -1, -1):
         optimal_tag_sequence[n] = backtracking_matrix[int(optimal_tag_sequence[n+1]), n]
     return optimal_tag_sequence#, backtracking_matrix, accumulated_prob_matrix
+
 
 @numba.jit(nopython=True, nogil=True)
 def handle_unknown_token(token):
@@ -206,7 +115,7 @@ def prepare_viterbi_input(words_sequence, train_vocab_dict, train_tags_dict):
             result[i] = -(train_tags_dict[handle_unknown_token(words_sequence[i])]+1)
     return result
 
-# @numba.jit(nopython=True, nogil=True)
+
 def process_results(expected_tags, predicted_tags):
     result = {}
     for i in numba.prange(len(expected_tags)):
@@ -218,6 +127,7 @@ def process_results(expected_tags, predicted_tags):
         else:
             result[expected_tags[i]] = {'pred_'+predicted_tags[i]:1}
     return result
+
 
 def save_results(result):
     df = pd.DataFrame.from_dict(result, dtype=np.int32)
@@ -237,6 +147,7 @@ def save_results(result):
     metrics_df.index = index
     metrics_df.to_csv('metrics_hmm.csv')
 
+
 @numba.jit(nopython=True, nogil=True, parallel=True)
 def viterbi_loop(sentences_array, tags_array, train_vocab_dict, train_tags_dict, transition_matrix, primeira_tag_prob, emission_matrix, train_tags, pred_tags_array, expc_tags_array):
     sentences_precision = np.zeros(len(sentences_array))
@@ -254,6 +165,7 @@ def viterbi_loop(sentences_array, tags_array, train_vocab_dict, train_tags_dict,
                 hits += 1
         sentences_precision[i] = hits / len(pred_tags_array[i])
     return pred_tags_array, expc_tags_array, sentences_precision
+
 
 def run_viterbi(word_sequence, tags_sequence, sentenceStartMarker, train_vocab_dict, train_tags_dict, transition_matrix, primeira_tag_prob, emission_matrix, train_tags):
     words_sequence_array = np.array(word_sequence)
@@ -307,4 +219,95 @@ def run_viterbi(word_sequence, tags_sequence, sentenceStartMarker, train_vocab_d
     save_results(process_results(expectations, predictions))
 
 
-run_viterbi(test_words_sequence, test_tags_sequence, sentenceStartMarker, train_vocab_dict, train_tags_dict, transition_matrix, primeira_tag_prob, emission_matrix, train_tags)
+def main():
+    if len(sys.argv) != 4:
+        print("Informe o caminho para o arquivo de treino, seguido pelo caminho para o arquivo de teste e por fim a string utilizada para separar os pares tag e token")
+        sys.exit()
+
+    sep = sys.argv[3]
+    train_pairs = []
+    train_vocab = set()
+    train_tags = set()
+
+    primeira_tag = []
+    primeira = True
+    with open(sys.argv[1], 'r') as file:
+        for line in file:
+            token, tag = sentenceStartMarker, sentenceStartMarker
+            train_pairs.append((token, tag))
+            primeira = True
+            for pair in re.split(' ', line):
+                if len(pair) > 2:
+                    token, tag = pair.split(sep)
+                    tag = tag.strip()
+                    if primeira:
+                        primeira = False
+                        primeira_tag.append(tag)
+                    train_pairs.append((token, tag))
+                    train_vocab.add(token)
+                    train_tags.add(tag)
+
+    train_words_sequence = [pair[0] for pair in train_pairs]
+    train_tags_sequence = [pair[1] for pair in train_pairs]
+    train_tags = sorted(list(train_tags))
+    train_vocab = sorted(list(train_vocab))
+
+    train_tags_dict = numba.typed.Dict()
+    train_vocab_dict = numba.typed.Dict()
+    primeira_tag_dict = {}
+
+    for i, tag in enumerate(train_tags):
+        train_tags_dict[tag] = i
+        primeira_tag_dict[tag] = 0
+
+    for i, w in enumerate(train_vocab):
+        train_vocab_dict[w] = i
+
+    for tag in primeira_tag:
+        primeira_tag_dict[tag] += 1
+
+    for tag in primeira_tag_dict:
+        primeira_tag_dict[tag] /= len(primeira_tag)
+
+    primeira_tag_prob = np.zeros(len(train_tags))
+    for i in range(len(train_tags)):
+        primeira_tag_prob[i] = primeira_tag_dict[train_tags[i]]
+
+    test_pairs = []
+    test_vocab = set()
+    test_tags = set()
+    with open(sys.argv[2], 'r') as file:
+        for line in file:
+            token, tag = sentenceStartMarker, sentenceStartMarker
+            test_pairs.append((token, tag))
+            for pair in re.split(' ', line):
+                if len(pair) > 2:
+                    token, tag = pair.split(sep)
+                    tag = tag.strip()
+                    test_pairs.append((token, tag))
+                    test_vocab.add(token)
+                    test_tags.add(tag)
+
+    test_words_sequence = [pair[0] for pair in test_pairs]
+    test_tags_sequence = [pair[1] for pair in test_pairs]
+    test_tags = sorted(list(test_tags))
+    test_vocab = sorted(list(test_vocab))
+
+    a = numba.typed.Dict()
+    b = numba.typed.Dict()
+    for i, tag in enumerate(list(set(train_tags_sequence[:2]))):
+        a[tag]=i
+    for i, w in enumerate(list(set(train_words_sequence[:2]))):
+        b[w]=i
+
+    emission_matrix = get_emission_matrix(train_tags_sequence[:2], train_words_sequence[:2], a, b)
+    emission_matrix = get_emission_matrix(train_tags_sequence, train_words_sequence, train_tags_dict, train_vocab_dict)
+
+    transition_matrix = create_transition_matrix(np.array(list(set(train_tags_sequence[:2]))), np.array(train_tags_sequence[:2]))
+    transition_matrix = create_transition_matrix(np.array(train_tags), np.array(train_tags_sequence))
+
+    run_viterbi(test_words_sequence, test_tags_sequence, sentenceStartMarker, train_vocab_dict, train_tags_dict, transition_matrix, primeira_tag_prob, emission_matrix, train_tags)
+
+
+if __name__ == "__main__":
+    main()
